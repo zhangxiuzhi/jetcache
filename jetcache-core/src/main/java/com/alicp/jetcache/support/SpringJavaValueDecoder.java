@@ -13,6 +13,9 @@ import java.io.ObjectInputStream;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class SpringJavaValueDecoder extends JavaValueDecoder {
+
+    public static final SpringJavaValueDecoder INSTANCE = new SpringJavaValueDecoder(true);
+
     public SpringJavaValueDecoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
     }

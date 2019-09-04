@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2017/5/17.
@@ -71,12 +71,15 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 Map<K, V> loadResult;
                 try {
                     loadResult = loader.loadAll(keysNeedLoad);
-                    for (Map.Entry<K, V> en : loadResult.entrySet()) {
-                        K key = en.getKey();
-                        V loadedValue = en.getValue();
-                        if (needUpdate(loadedValue, loader)) {
-                            PUT(key, loadedValue);
-                        }
+
+                    CacheLoader<K, V> theLoader = loader;
+                    Map<K, V> updateValues = loadResult.entrySet().stream()
+                            .filter(kvEntry -> needUpdate(kvEntry.getValue(), theLoader))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                    // batch put
+                    if (!updateValues.isEmpty()) {
+                        PUT_ALL(updateValues);
                     }
                 } catch (Throwable e) {
                     throw new CacheInvokeException(e);
@@ -91,8 +94,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                             PUT(key, v);
                         }
                     };
-                    V v = AbstractCache.synchronizedLoad(abstractCache, key, loader,
-                            cacheUpdater, abstractCache.initOrGetLoaderMap());
+                    V v = AbstractCache.synchronizedLoad(config, abstractCache, key, loader, cacheUpdater);
                     kvMap.put(key, v);
                 }
             }
