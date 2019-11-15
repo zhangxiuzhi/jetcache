@@ -384,6 +384,7 @@
                     </plugin>
                 </plugins>
             </build>
+<!--
             <distributionManagement>
                 <snapshotRepository>
                     <id>oss</id>
@@ -393,6 +394,19 @@
                     <id>oss</id>
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
+            </distributionManagement>
+            -->
+
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>nexus</id>
+                    <url>http://10.0.1.228:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>nexus</id>
+                    <url>http://10.0.1.228:8081/nexus/content/repositories/releases/</url>
+                </repository>
+
             </distributionManagement>
         </profile>
     </profiles>
